@@ -13,6 +13,12 @@ fn main() {
     float_number = float_number + my_int as f64;
     println!("{float_number}");
 
+    let mut my_bool = true;
+    println!("{my_bool}");
+
+    my_bool = false || true;
+    println!("{my_bool}");
+
 
     
 }
