@@ -6,7 +6,7 @@ fn main() {
     // todo!() macro
 
     // variables
-    let mut cadena = "Hola mundo";
+    let mut cadena: &str = "Hola mundo";
     println!("{}", cadena);
     println!("{cadena}");
     cadena = "hola mundo 222";
