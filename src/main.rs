@@ -6,16 +6,13 @@ fn main() {
     // todo!() macro
 
     // variables
-    let mut mutable_string: String = String::from("Hola mundo");
-    println!("{mutable_string}");
-    mutable_string = String::from("o 2");
-    println!("{mutable_string}");
 
-    let mut my_int: i32 = 7;
-    print!("{my_int}");
+    let my_int: i64= 10;
+    println!("{my_int}");
+    let mut float_number = 10.0;
+    float_number = float_number + my_int as f64;
+    println!("{float_number}");
 
-    my_int = my_int + 3;
-    print!("{my_int}");
 
     
 }
