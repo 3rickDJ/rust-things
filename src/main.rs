@@ -19,6 +19,7 @@ fn main() {
     my_bool = false || true;
     println!("{my_bool}");
 
-
+    const MY_CONST:&str  = "hola";
+    println!("{MY_CONST}");
     
 }
