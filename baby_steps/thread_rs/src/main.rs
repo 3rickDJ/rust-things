@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, Condvar};
 use std::thread;
 use std::time::Duration;
 
@@ -21,16 +21,13 @@ fn main() {
         Proceso { nombre: String::from("Proceso 1"), tiempo_ejecucion: 3, tamano: 100 },
         Proceso { nombre: String::from("Proceso 2"), tiempo_ejecucion: 2, tamano: 200 },
         Proceso { nombre: String::from("Proceso 3"), tiempo_ejecucion: 5, tamano: 150 },
-        Proceso { nombre: String::from("Proceso 4"), tiempo_ejecucion: 3, tamano: 100 },
-        Proceso { nombre: String::from("Proceso 5"), tiempo_ejecucion: 2, tamano: 200 },
-        Proceso { nombre: String::from("Proceso 6"), tiempo_ejecucion: 5, tamano: 150 },
     ];
 
-    // Lista de compartimientos de memoria, cada uno protegido por un Mutex
+    // Compartimientos de memoria compartidos entre hilos
     let compartimientos = vec![
-        Arc::new(Mutex::new(Compartimiento { tamano: 200, libre: true })),
-        Arc::new(Mutex::new(Compartimiento { tamano: 100, libre: true })),
-        Arc::new(Mutex::new(Compartimiento { tamano: 300, libre: true })),
+        Arc::new((Mutex::new(Compartimiento { tamano: 901, libre: true }), Condvar::new())),
+        Arc::new((Mutex::new(Compartimiento { tamano: 902, libre: true }), Condvar::new())),
+        Arc::new((Mutex::new(Compartimiento { tamano: 903, libre: true }), Condvar::new())),
     ];
 
     let mut handles = vec![];
@@ -38,28 +35,37 @@ fn main() {
     for proceso in procesos {
         let compartimientos = compartimientos.clone();
         let handle = thread::spawn(move || {
-            // Intentar encontrar y asignar un compartimiento de memoria al proceso
-            let compartimiento_encontrado = compartimientos.iter().find(|&comp| {
-                let mut comp = comp.lock().unwrap();
-                if comp.libre && comp.tamano >= proceso.tamano {
-                    comp.libre = false;
-                    println!("{} está utilizando un compartimiento de {} unidades.", proceso.nombre, comp.tamano);
-                    true
-                } else {
-                    false
+            let mut compartimiento_asignado = None;
+
+            while compartimiento_asignado.is_none() {
+                for arc in compartimientos.iter() {
+                    let (mutex, condvar) = &**arc; // Desreferenciar el Arc para obtener Mutex y Condvar
+                    let mut compartimiento = mutex.lock().unwrap();
+
+                    if compartimiento.libre && compartimiento.tamano >= proceso.tamano {
+                        compartimiento.libre = false;
+                        compartimiento_asignado = Some((Arc::clone(arc), condvar));
+                        println!("{} está utilizando un compartimiento de {} unidades.", proceso.nombre, compartimiento.tamano);
+                        break;
+                    }
                 }
-            });
 
-            if let Some(compartimiento) = compartimiento_encontrado {
-                // Simular la ejecución del proceso
-                thread::sleep(Duration::from_secs(proceso.tiempo_ejecucion));
-                println!("{} ha terminado la ejecución.", proceso.nombre);
+                if compartimiento_asignado.is_none() {
+                    // Espera activa antes de intentar de nuevo
+                    thread::sleep(Duration::from_millis(100));
+                }
+            }
 
-                // Liberar el compartimiento
-                let mut comp = compartimiento.lock().unwrap();
-                comp.libre = true;
-            } else {
-                println!("No hay compartimientos de memoria disponibles para {}.", proceso.nombre);
+            // Simular la ejecución del proceso
+            thread::sleep(Duration::from_secs(proceso.tiempo_ejecucion));
+            println!("{} ha terminado la ejecución.", proceso.nombre);
+
+            // Liberar el compartimiento y notificar a los otros hilos
+            if let Some((arc, condvar)) = compartimiento_asignado {
+                let (mutex, _) = &*arc;
+                let mut compartimiento = mutex.lock().unwrap();
+                compartimiento.libre = true;
+                condvar.notify_one();
             }
         });
 
