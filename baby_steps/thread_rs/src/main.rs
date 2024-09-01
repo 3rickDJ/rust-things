@@ -21,6 +21,9 @@ fn main() {
         Proceso { nombre: String::from("Proceso 1"), tiempo_ejecucion: 3, tamano: 100 },
         Proceso { nombre: String::from("Proceso 2"), tiempo_ejecucion: 2, tamano: 200 },
         Proceso { nombre: String::from("Proceso 3"), tiempo_ejecucion: 5, tamano: 150 },
+        Proceso { nombre: String::from("Proceso 4"), tiempo_ejecucion: 3, tamano: 100 },
+        Proceso { nombre: String::from("Proceso 5"), tiempo_ejecucion: 2, tamano: 200 },
+        Proceso { nombre: String::from("Proceso 6"), tiempo_ejecucion: 5, tamano: 150 },
     ];
 
     // Lista de compartimientos de memoria, cada uno protegido por un Mutex
