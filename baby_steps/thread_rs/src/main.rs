@@ -1,78 +1,86 @@
-use std::sync::{Arc, Mutex, Condvar};
+#![allow(unused)]
+use std::sync::{mpsc};
 use std::thread;
 use std::time::Duration;
 
 // Estructura para representar un proceso
-struct Proceso {
-    nombre: String,
-    tiempo_ejecucion: u64, // Tiempo de ejecución en segundos
-    tamano: usize,         // Tamaño del proceso
+//copy trait
+#[derive(Clone)]
+struct Process {
+    name: usize,
+    execution_time: u64, // Tiempo de ejecución en segundos
+    size: usize,         // Tamaño del proceso
 }
 
 // Estructura para representar un compartimiento de memoria
-struct Compartimiento {
-    tamano: usize,
-    libre: bool,
+#[derive(Debug)]
+struct MemoryPartition {
+    size: usize,
+    free: bool,
+    index: usize,
 }
 
 fn main() {
     // Lista de procesos
-    let procesos = vec![
-        Proceso { nombre: String::from("Proceso 1"), tiempo_ejecucion: 3, tamano: 100 },
-        Proceso { nombre: String::from("Proceso 2"), tiempo_ejecucion: 2, tamano: 200 },
-        Proceso { nombre: String::from("Proceso 3"), tiempo_ejecucion: 5, tamano: 150 },
+    let mut procesos = vec![
+        Process { name: 1, execution_time: 3, size: 100 },
+        Process { name: 2, execution_time: 3, size: 100 },
+        Process { name: 3, execution_time: 3, size: 100 },
+        Process { name: 4, execution_time: 3, size: 100 },
+        Process { name: 5, execution_time: 3, size: 100 },
+        Process { name: 6, execution_time: 3, size: 100 },
+        Process { name: 7, execution_time: 3, size: 100 },
     ];
 
     // Compartimientos de memoria compartidos entre hilos
-    let compartimientos = vec![
-        Arc::new((Mutex::new(Compartimiento { tamano: 901, libre: true }), Condvar::new())),
-        Arc::new((Mutex::new(Compartimiento { tamano: 902, libre: true }), Condvar::new())),
-        Arc::new((Mutex::new(Compartimiento { tamano: 903, libre: true }), Condvar::new())),
+    let mut compartimientos = vec![
+        MemoryPartition { size: 200, free: true, index:0 },
+        MemoryPartition { size: 200, free: true, index:1 },
+        MemoryPartition { size: 200, free: true, index:2 },
+        MemoryPartition { size: 200, free: true, index:3 },
     ];
 
     let mut handles = vec![];
+    let (sender, receiver) = mpsc::channel();
 
-    for proceso in procesos {
-        let compartimientos = compartimientos.clone();
-        let handle = thread::spawn(move || {
-            let mut compartimiento_asignado = None;
+    while procesos.len() > 0 {
+        let proceso = procesos[0].clone();
 
-            while compartimiento_asignado.is_none() {
-                for arc in compartimientos.iter() {
-                    let (mutex, condvar) = &**arc; // Desreferenciar el Arc para obtener Mutex y Condvar
-                    let mut compartimiento = mutex.lock().unwrap();
+        let available_partition = compartimientos.iter_mut().find(|x| x.free && x.size >= proceso.size);
+        match available_partition {
+            Some(partition) => {
+                partition.free = false;
+                let index = partition.index;
+                let sender_clone = sender.clone();
+                let time = proceso.execution_time;
+                let name = proceso.name;
+                let handle = thread::spawn(move|| {
+                    println!("\tProceso {} en ejecución en el compartimiento {}.", name, index);
+                    thread::sleep(Duration::from_secs(time));
+                    println!("\t\tProceso {} finalizado.", name);
+                    sender_clone.send(index).unwrap();
+                });
+                handles.push(handle);
+                procesos.remove(0);
+            },
+            _ => {}
+        }
 
-                    if compartimiento.libre && compartimiento.tamano >= proceso.tamano {
-                        compartimiento.libre = false;
-                        compartimiento_asignado = Some((Arc::clone(arc), condvar));
-                        println!("{} está utilizando un compartimiento de {} unidades.", proceso.nombre, compartimiento.tamano);
-                        break;
+        match receiver.try_recv() {
+            Ok(proceso_finalizado) => {
+                let partition = compartimientos.iter_mut().find(|x| x.index == proceso_finalizado);
+                match partition {
+                    Some(partition) => {
+                        partition.free = true;
+                    },
+                    _ => {
+                        println!("No se encontró el compartimiento del proceso {}.", proceso_finalizado);
                     }
                 }
-
-                if compartimiento_asignado.is_none() {
-                    // Espera activa antes de intentar de nuevo
-                    thread::sleep(Duration::from_millis(100));
-                }
-            }
-
-            // Simular la ejecución del proceso
-            thread::sleep(Duration::from_secs(proceso.tiempo_ejecucion));
-            println!("{} ha terminado la ejecución.", proceso.nombre);
-
-            // Liberar el compartimiento y notificar a los otros hilos
-            if let Some((arc, condvar)) = compartimiento_asignado {
-                let (mutex, _) = &*arc;
-                let mut compartimiento = mutex.lock().unwrap();
-                compartimiento.libre = true;
-                condvar.notify_one();
-            }
-        });
-
-        handles.push(handle);
+            },
+            Err(e) => {}
+        }
     }
-
-    // Esperar a que todos los hilos terminen
     for handle in handles {
         handle.join().unwrap();
     }
