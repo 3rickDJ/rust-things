@@ -23,8 +23,8 @@ struct MemoryPartition {
 fn main() {
     // Lista de procesos
     let mut procesos = vec![
-        Process { name: 1, execution_time: 3, size: 100 },
-        Process { name: 2, execution_time: 3, size: 100 },
+        Process { name: 1, execution_time: 1, size: 100 },
+        Process { name: 2, execution_time: 10, size: 100 },
         Process { name: 3, execution_time: 3, size: 100 },
         Process { name: 4, execution_time: 3, size: 100 },
         Process { name: 5, execution_time: 3, size: 100 },
@@ -52,16 +52,14 @@ fn main() {
                 partition.free = false;
                 let index = partition.index;
                 let sender_clone = sender.clone();
-                let time = proceso.execution_time;
-                let name = proceso.name;
+                let proceso = procesos.remove(0);
                 let handle = thread::spawn(move|| {
-                    println!("\tProceso {} en ejecución en el compartimiento {}.", name, index);
-                    thread::sleep(Duration::from_secs(time));
-                    println!("\t\tProceso {} finalizado.", name);
+                    println!("\tProceso {} en ejecución en el compartimiento {}.", proceso.name, index);
+                    thread::sleep(Duration::from_secs(proceso.execution_time));
+                    println!("\t\tProceso {} finalizado. Del compartimiento {}", proceso.name, index);
                     sender_clone.send(index).unwrap();
                 });
                 handles.push(handle);
-                procesos.remove(0);
             },
             _ => {}
         }
