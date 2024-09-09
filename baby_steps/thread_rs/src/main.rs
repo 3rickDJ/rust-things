@@ -1,87 +1,41 @@
-#![allow(unused)]
-use std::sync::{mpsc};
-use std::thread;
-use std::time::Duration;
+use std::sync::mpsc;
+use std::thread::JoinHandle;
+mod message;
+use message::{MemoryPartition, ProcessMessage};
+mod simulator;
+use simulator::{Reader, Dispatcher};
 
-// Estructura para representar un proceso
-//copy trait
-#[derive(Clone)]
-struct Process {
-    name: usize,
-    execution_time: u64, // Tiempo de ejecución en segundos
-    size: usize,         // Tamaño del proceso
-}
-
-// Estructura para representar un compartimiento de memoria
-#[derive(Debug)]
-struct MemoryPartition {
-    size: usize,
-    free: bool,
-    index: usize,
-}
 
 fn main() {
-    // Lista de procesos
-    let mut procesos = vec![
-        Process { name: 1, execution_time: 1, size: 100 },
-        Process { name: 2, execution_time: 10, size: 100 },
-        Process { name: 3, execution_time: 3, size: 100 },
-        Process { name: 4, execution_time: 3, size: 100 },
-        Process { name: 5, execution_time: 3, size: 100 },
-        Process { name: 6, execution_time: 3, size: 100 },
-        Process { name: 7, execution_time: 3, size: 100 },
-    ];
+    let mut handles: Vec<JoinHandle<()>> = vec![];
+    let (process_message_sender, dispatcher_receiver) = mpsc::channel::<ProcessMessage>();
 
-    // Compartimientos de memoria compartidos entre hilos
-    let mut compartimientos = vec![
-        MemoryPartition { size: 200, free: true, index:0 },
-        MemoryPartition { size: 200, free: true, index:1 },
-        MemoryPartition { size: 200, free: true, index:2 },
-        MemoryPartition { size: 200, free: true, index:3 },
-    ];
+    let reader = Reader::new("procesess.csv".to_string());
+    let reader_thread = reader.run(process_message_sender);
+    handles.push(reader_thread);
 
-    let mut handles = vec![];
-    let (sender, receiver) = mpsc::channel();
+    let (dispatcher_sender, allocation_receiver) = mpsc::channel::<ProcessMessage>();
 
-    while procesos.len() > 0 {
-        let proceso = procesos[0].clone();
+    let dispatcher = Dispatcher::new(dispatcher_receiver, dispatcher_sender);
+    let dispatcher_handle = dispatcher.run();
+    handles.push(dispatcher_handle);
 
-        let available_partition = compartimientos.iter_mut().find(|x| x.free && x.size >= proceso.size);
-        match available_partition {
-            Some(partition) => {
-                partition.free = false;
-                let index = partition.index;
-                let sender_clone = sender.clone();
-                let proceso = procesos.remove(0);
-                let handle = thread::spawn(move|| {
-                    println!("\tProceso {} en ejecución en el compartimiento {}.", proceso.name, index);
-                    thread::sleep(Duration::from_secs(proceso.execution_time));
-                    println!("\t\tProceso {} finalizado. Del compartimiento {}", proceso.name, index);
-                    sender_clone.send(index).unwrap();
-                });
-                handles.push(handle);
+    let (allocation_sender, execution_receiver) = mpsc::channel::<MemoryPartition>();
+
+    for message in allocation_receiver {
+        match message {
+            ProcessMessage::Process(process) => {
+                println!("Proceso recibido en allocation: {:?}", &process);
             },
-            _ => {}
-        }
-
-        match receiver.try_recv() {
-            Ok(proceso_finalizado) => {
-                let partition = compartimientos.iter_mut().find(|x| x.index == proceso_finalizado);
-                match partition {
-                    Some(partition) => {
-                        partition.free = true;
-                    },
-                    _ => {
-                        println!("No se encontró el compartimiento del proceso {}.", proceso_finalizado);
-                    }
-                }
-            },
-            Err(e) => {}
+            ProcessMessage::Quit => {
+                println!("Fin de la simulación.");
+                break;
+            }
         }
     }
+
     for handle in handles {
         handle.join().unwrap();
     }
-
     println!("Simulación completada.");
 }
