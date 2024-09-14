@@ -1,5 +1,5 @@
 use std::{sync::mpsc::Sender, thread, fs::File};
-use std::io::{self, BufRead, BufReader};
+use std::io::{BufRead, BufReader};
 use crate::message::{Process, ProcessMessage};
 use rand::Rng;
 use std::time::Duration;

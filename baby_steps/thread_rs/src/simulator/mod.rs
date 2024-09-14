@@ -4,3 +4,4 @@ mod allocation;
 
 pub use reader::Reader;
 pub use dispatch::Dispatcher;
+pub use allocation::BuddyAllocator;
