@@ -1,9 +1,10 @@
-use std::sync::mpsc;
-use std::thread::JoinHandle;
+use std::sync::{mpsc, Arc, Mutex};
+use std::thread::{self, JoinHandle};
+use std::time;
 mod message;
-use message::{MemoryPartition, ProcessMessage};
+use message::{MemoryPartition, ParitionMessage, ProcessMessage};
 mod simulator;
-use simulator::{Reader, Dispatcher};
+use simulator::{BuddyAllocator, Dispatcher, Reader};
 
 
 fn main() {
@@ -20,7 +21,42 @@ fn main() {
     let dispatcher_handle = dispatcher.run();
     handles.push(dispatcher_handle);
 
-    let (allocation_sender, execution_receiver) = mpsc::channel::<MemoryPartition>();
+    // let (allocation_sender, execution_receiver) = mpsc::channel::<MemoryPartition>();
+    let mut allocator = BuddyAllocator::new(1_048_576);
+    let (allocation_sender, execution_receiver) = mpsc::channel::<ParitionMessage>();
+
+    loop {
+      if let Ok(message) = allocation_receiver.try_recv() {
+        match message {
+          ProcessMessage::Process(process) => {
+            let mut result = allocator.allocate(process.size);
+            while let None = result {
+              match execution_receiver.try_recv() {
+                Ok(ParitionMessage::Index(index)) => {
+                  allocator.deallocate(index);
+                },
+                Ok(ParitionMessage::Quit) => {
+                  break;
+                },
+                Err(_) => {}
+              }
+              result = allocator.allocate(process.size);
+            }
+            if let Some(index) = result {
+              let sender_clone = allocation_sender.clone();
+              let handle = thread::spawn(move || {
+                println!("Proceso {} iniciado.", &process.name);
+                thread::sleep(time::Duration::from_secs(process.execution_time));
+                println!("Proceso {} completado.", &process.name);
+                sender_clone.send(ParitionMessage::Index(index)).unwrap();
+              });
+              handles.push(handle);
+            } 
+          },
+          ProcessMessage::Quit => break,
+        }
+      }
+    }
 
     for message in allocation_receiver {
         match message {

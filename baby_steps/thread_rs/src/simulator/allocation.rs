@@ -22,6 +22,7 @@ impl BuddyAllocator {
     let level = (size as f64).log2().ceil() as usize;
     if let Some((start,end)) = self.arr[level].pop(){
       self.mp.insert(start, end-start+1);
+      println!("{:#?}", self.arr);
       return Some(start)
     }  else {
       let mut i = level;
@@ -42,6 +43,7 @@ impl BuddyAllocator {
           i -= 1;
         }
         self.mp.insert(start, 1<<level);
+        println!("{:#?}", self.arr);
         Some(start)
       }
     }
@@ -57,7 +59,6 @@ impl BuddyAllocator {
       println!("Blocked {} - {}, freed!", block.0, block.1);
       // compact
       while n < self.arr.len() {
-        println!("{:#?}", self.arr);
         let size = 1<<n;
         let buddy_is_right = id/size % 2 == 0;
 

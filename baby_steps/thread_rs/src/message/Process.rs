@@ -2,9 +2,9 @@
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct Process {
-    name: usize,
-    execution_time: u64, // Tiempo de ejecución en segundos
-    size: usize,         // Tamaño del proceso
+    pub name: usize,
+    pub execution_time: u64, // Tiempo de ejecución en segundos
+    pub size: usize,         // Tamaño del proceso
 }
 
 impl Process  {
