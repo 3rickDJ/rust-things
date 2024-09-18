@@ -26,6 +26,7 @@ impl Dispatcher {
           },
           ProcessMessage::Quit => {
             println!("Fin de la simulación.");
+            self.sender.send(ProcessMessage::Quit).unwrap();
             break;
           }
         }

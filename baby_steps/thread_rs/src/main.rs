@@ -22,9 +22,10 @@ fn main() {
     handles.push(dispatcher_handle);
 
     // let (allocation_sender, execution_receiver) = mpsc::channel::<MemoryPartition>();
-    let mut allocator = BuddyAllocator::new(1024);
+    let mut allocator = BuddyAllocator::new(1<<21);
     let (allocation_sender, execution_receiver) = mpsc::channel::<ParitionMessage>();
-
+    //take time
+    let start_time = time::Instant::now();
     loop {
       if let Ok(message) = allocation_receiver.try_recv() {
         match message {
@@ -69,9 +70,14 @@ fn main() {
             }
         }
     }
+    println!("Fin de la simulación.");
 
     for handle in handles {
         handle.join().unwrap();
     }
+    let end_time = time::Instant::now();
+    let duration = end_time.duration_since(start_time);
+    //print hours minutes and seconds
+    println!("Tiempo de ejecución: {} horas, {} minutos, {} segundos.", duration.as_secs() / 3600, (duration.as_secs() % 3600) / 60, duration.as_secs() % 60);
     println!("Simulación completada.");
 }

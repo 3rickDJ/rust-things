@@ -34,6 +34,7 @@ impl Reader {
         thread::sleep(Duration::from_millis(rand_time));
         process_message_sender.send(process_message).unwrap();
       }
+      process_message_sender.send(ProcessMessage::Quit).unwrap();
     })
   }
 }
