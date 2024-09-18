@@ -1,8 +1,8 @@
-use std::sync::{mpsc, Arc, Mutex};
+use std::sync::mpsc;
 use std::thread::{self, JoinHandle};
 use std::time;
 mod message;
-use message::{MemoryPartition, ParitionMessage, ProcessMessage};
+use message::{ParitionMessage, ProcessMessage};
 mod simulator;
 use simulator::{BuddyAllocator, Dispatcher, Reader};
 
@@ -22,7 +22,7 @@ fn main() {
     handles.push(dispatcher_handle);
 
     // let (allocation_sender, execution_receiver) = mpsc::channel::<MemoryPartition>();
-    let mut allocator = BuddyAllocator::new(1_048_576);
+    let mut allocator = BuddyAllocator::new(1024);
     let (allocation_sender, execution_receiver) = mpsc::channel::<ParitionMessage>();
 
     loop {

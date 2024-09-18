@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+//ignore the unused field
+#[allow(dead_code)]
 pub struct BuddyAllocator {
   size: usize,
   arr: Vec<Vec<(usize, usize)>>,
@@ -62,11 +64,7 @@ impl BuddyAllocator {
         let size = 1<<n;
         let buddy_is_right = id/size % 2 == 0;
 
-        let buddy_id = if buddy_is_right {
-          block.1 + 1
-        } else {
-          block.0 - size
-        };
+        let buddy_id = if buddy_is_right { block.1 + 1 } else { block.0 - size };
         if let Some(index) = self.arr[n].iter().position(|&(start,_)| start == buddy_id ){
           let buddy = self.arr[n].remove(index);
           // uno
