@@ -24,7 +24,6 @@ impl BuddyAllocator {
     let level = (size as f64).log2().ceil() as usize;
     if let Some((start,end)) = self.arr[level].pop(){
       self.mp.insert(start, end-start+1);
-      println!("{:#?}", self.arr);
       return Some(start)
     }  else {
       let mut i = level;
@@ -45,7 +44,6 @@ impl BuddyAllocator {
           i -= 1;
         }
         self.mp.insert(start, 1<<level);
-        println!("{:#?}", self.arr);
         Some(start)
       }
     }
@@ -58,7 +56,6 @@ impl BuddyAllocator {
       let mut block: (usize, usize) = (id, id + size-1);
       //freed the block
       self.arr[n].push(block);
-      println!("Blocked {} - {}, freed!", block.0, block.1);
       // compact
       while n < self.arr.len() {
         let size = 1<<n;
@@ -95,7 +92,6 @@ use super::*;
   fn test_buddy_instantiation() {
     let buddy = BuddyAllocator::new(1024);
     let arr: &Vec<Vec<(usize,usize)>> = &buddy.arr;
-    println!("arr: {arr:?}");
     assert_eq!(buddy.size, 1024);
     assert_eq!(buddy.arr.len(), 11);
     assert_eq!(buddy.arr[10].len(), 1);
@@ -155,4 +151,91 @@ use super::*;
     assert_eq!(buddy.arr[3].len(), 0);
   }
 
+}
+
+use crate::message::MemoryPartition;
+
+pub struct FixedPartitionAllocator {
+  arr: Vec<MemoryPartition>
+}
+
+impl FixedPartitionAllocator {
+  pub fn new(partitions: Vec<usize>) -> Self {
+    let mut arr: Vec<MemoryPartition> = Vec::new();
+    for (i, &size) in partitions.iter().enumerate(){
+      arr.push(MemoryPartition::new(size, true, i));
+    }
+    FixedPartitionAllocator { arr }
+  }
+
+  pub fn allocate(&mut self, size: usize) -> Option<usize> {
+    if let Some(pos) = self.arr.iter().position(|x| x.free && x.size >= size) {
+      self.arr[pos].free = false;
+      Some(pos)
+    } else {
+      None
+    }
+  }
+
+  pub fn deallocate(&mut self, index: usize) {
+    self.arr[index].free = true;
+  }
+}
+#[cfg(test)]
+mod test_fixed_partitions {
+  use super::*;
+
+  #[test]
+  fn test_fixed_partition_instantiation() {
+    let partitions = vec![32, 64, 128];
+    let allocator = FixedPartitionAllocator::new(partitions);
+    assert_eq!(allocator.arr.len(), 3);
+    assert_eq!(allocator.arr[0].size, 32);
+    assert_eq!(allocator.arr[1].size, 64);
+    assert_eq!(allocator.arr[2].size, 128);
+  }
+
+  #[test]
+  fn test_fixed_partition_allocation() {
+    let partitions = vec![32, 64, 128];
+    let mut allocator = FixedPartitionAllocator::new(partitions);
+    let alloc_res = allocator.allocate(32);
+    assert_eq!(alloc_res, Some(0));
+    assert_eq!(allocator.arr[0].free, false);
+    let alloc_res = allocator.allocate(64);
+    assert_eq!(alloc_res, Some(1));
+    assert_eq!(allocator.arr[1].free, false);
+    let alloc_res = allocator.allocate(128);
+    assert_eq!(alloc_res, Some(2));
+    assert_eq!(allocator.arr[2].free, false);
+  }
+
+  #[test]
+  fn test_fixed_partition_allocation_failure() {
+    let partitions = vec![32, 64, 128];
+    let mut allocator = FixedPartitionAllocator::new(partitions);
+    let alloc_res = allocator.allocate(256);
+    assert_eq!(alloc_res, None);
+  }
+
+  #[test]
+  fn test_fixed_partition_deallocation() {
+    let partitions = vec![32, 64, 128];
+    let mut allocator = FixedPartitionAllocator::new(partitions);
+    let alloc_res = allocator.allocate(32).unwrap();
+    assert_eq!(allocator.arr[0].free, false);
+    allocator.deallocate(alloc_res);
+    assert_eq!(allocator.arr[0].free, true);
+  }
+
+  #[test]
+  fn test_fixed_partition_reallocation() {
+    let partitions = vec![32, 64, 128];
+    let mut allocator = FixedPartitionAllocator::new(partitions);
+    let alloc_res = allocator.allocate(32).unwrap();
+    allocator.deallocate(alloc_res);
+    let alloc_res = allocator.allocate(32);
+    assert_eq!(alloc_res, Some(0));
+    assert_eq!(allocator.arr[0].free, false);
+  }
 }

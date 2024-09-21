@@ -4,7 +4,7 @@ use std::time;
 mod message;
 use message::{ParitionMessage, ProcessMessage};
 mod simulator;
-use simulator::{BuddyAllocator, Dispatcher, Reader};
+use simulator::{BuddyAllocator, Dispatcher, Reader, FixedPartitionAllocator};
 
 
 fn main() {
@@ -21,8 +21,8 @@ fn main() {
     let dispatcher_handle = dispatcher.run();
     handles.push(dispatcher_handle);
 
-    // let (allocation_sender, execution_receiver) = mpsc::channel::<MemoryPartition>();
     let mut allocator = BuddyAllocator::new(1<<21);
+    // let mut allocator = FixedPartitionAllocator::new(vec![1<<10, 1<<12, 1<<12, 1<<12, 1<< 18, 1<< 18, 1<<19 ,1_048_576]);
     let (allocation_sender, execution_receiver) = mpsc::channel::<ParitionMessage>();
     //take time
     let start_time = time::Instant::now();
@@ -58,19 +58,6 @@ fn main() {
         }
       }
     }
-
-    for message in allocation_receiver {
-        match message {
-            ProcessMessage::Process(process) => {
-                println!("Proceso recibido en allocation: {:?}", &process);
-            },
-            ProcessMessage::Quit => {
-                println!("Fin de la simulación.");
-                break;
-            }
-        }
-    }
-    println!("Fin de la simulación.");
 
     for handle in handles {
         handle.join().unwrap();
