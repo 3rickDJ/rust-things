@@ -2,5 +2,16 @@
 name = "virtual_to_physical_address"
 version = "0.1.0"
 edition = "2021"
+default-run = "main"
 
 [dependencies]
+rand = "0.8.5"
+
+
+[[bin]]
+name = "gen_entries"
+path = "src/gen_entries.rs"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
