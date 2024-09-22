@@ -1,4 +1,3 @@
-use core::num;
 use std::io::{stdin, Read};
 use std::mem::size_of;
 use std::fs::File;
@@ -19,7 +18,7 @@ fn main() {
         // take input
         let input = match stdin().read_line(&mut input) {
             Ok(0) => {panic!("Error, nada se ha leido")},
-            Ok(_) => input.trim(),
+            Ok(_) => input.trim().replace("_", ""),
             Err(e) => {panic!("Error al leer la línea: {e}")}
         };
 
