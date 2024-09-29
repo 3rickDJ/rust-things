@@ -4,7 +4,6 @@ use regex::Regex;
 use std::time::Instant;
 use once_cell::sync::Lazy;
 
-
 #[derive(Debug)]
 struct Point (u16,u16);
 impl Point {
@@ -26,8 +25,10 @@ enum Instruction {
 
 impl Instruction {
     pub fn new(line: &str) -> Instruction {
-        let re = Regex::new(r"(?<type>turn off|turn on|toggle) (?<p1>\d+),(?<p2>\d+) through (?<p3>\d+),(?<p4>\d+)").unwrap();
-        let caps = re.captures(&line).unwrap();
+        static RE: Lazy<Regex> = Lazy::new(|| {
+            Regex::new(r"(?<type>turn off|turn on|toggle) (?<p1>\d+),(?<p2>\d+) through (?<p3>\d+),(?<p4>\d+)").unwrap()
+        });
+        let caps = RE.captures(&line).unwrap();
         let a = Point::from_str(&caps["p1"], &caps["p2"]);
         let b = Point::from_str(&caps["p3"], &caps["p4"]);
         match &caps["type"] {
