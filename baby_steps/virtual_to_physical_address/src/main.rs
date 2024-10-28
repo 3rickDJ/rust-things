@@ -2,10 +2,10 @@ use std::io::{stdin, Read};
 use std::mem::size_of;
 use std::fs::File;
 
-const USIZE_SIZE: usize = size_of::<usize>() * 4;
+const USIZE_SIZE: usize = size_of::<usize>() * 2;
 
 fn main() {
-    let (page_size, number_of_pages, number_of_frames, mut page_table) = read_configuration_and_page_table("page_table.txt");
+    let (page_size, number_of_pages, number_of_frames, page_table) = read_configuration_and_page_table("page_table.txt");
 
     let _page_bits = (number_of_pages as f64).log2().ceil() as usize;
     let frame_bits = (number_of_frames as f64).log2().ceil() as usize;
@@ -29,10 +29,15 @@ fn main() {
         let page_number = number >> offset_bits;
         let page_entry = page_table[page_number];
         let present_bit = (page_entry >> frame_bits) & 1;
-        println!("Entrada de la tabla de páginas: {:>48}", format_binary(page_entry));
-        println!("Direccion física: {:>62}", format_binary(page_entry & ((1 << frame_bits) - 1)));
-        println!("Desplazamiento: {:>64}", format_binary(number & ((1 << offset_bits) - 1)));
-        println!("Bits asociados: {:>64}", format_binary(page_entry >> frame_bits));
+        let entry_bits = page_entry;
+        println!("Entrada de la tabla de páginas: {:>48} {entry_bits} ", format_binary(entry_bits, USIZE_SIZE ));
+        let entry_bits = page_entry & ((1 << frame_bits) - 1);
+        println!("Direccion física: {:>62} {entry_bits}", format_binary(entry_bits, frame_bits/8 + 1));
+        let entry_bits = number & ((1 << offset_bits) - 1);
+        println!("Desplazamiento: {:>64} {entry_bits}", format_binary(entry_bits, offset_bits/8 + 1));
+        let entry_bits = page_entry >> frame_bits;
+        println!("Bits asociados: {:>64} {entry_bits}", format_binary(entry_bits, frame_bits/8 +1));
+        println!("CacheDisabled {0}, Referenced {1}, Modified {2}, Protection {3}, Present/Absent {4}", (entry_bits & 0b10000) >> 4, (entry_bits & 0b1000) >> 3, (entry_bits & 0b100) >> 2, (entry_bits & 0b10) >> 1, entry_bits & 0b1);
         if present_bit == 0 {
             println!("La página no está presente en memoria principal");
             continue;
@@ -41,9 +46,9 @@ fn main() {
     }
 }
 
-fn format_binary(number: usize) -> String {
+fn format_binary(number: usize, width: usize) -> String {
     //each byte separated  by a '_', and left padded with 0 with a total of 32 characters
-    let binary = format!("{:0USIZE_SIZE$b}", number);
+    let binary = format!("{:0width$b}", number);
     let mut formatted = String::new();
     for (i, c) in binary.chars().enumerate() {
         formatted.push(c);

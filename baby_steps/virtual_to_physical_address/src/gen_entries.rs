@@ -6,9 +6,9 @@ use std::fs::File;
 
 const USIZE_SIZE: usize = size_of::<usize>() * 8;
 fn main() {
-  let page_size = 1024;
-  let number_of_pages = 256;
-  let number_of_frames = 128;
+  let page_size = 32;
+  let number_of_pages = 16;
+  let number_of_frames = 8;
   let mut page_table: Vec<usize> = vec![0; number_of_pages];
   let mut rng = rand::thread_rng();
   let frame_bits = (number_of_frames as f64).log2().ceil() as usize;
@@ -16,7 +16,7 @@ fn main() {
   let mut used_frames = HashSet::new();
 
   for i in 0..number_of_pages {
-    let mut info_bits: usize = rng.gen_range(0..=127) & 0b1111110;
+    let mut info_bits: usize = rng.gen_range(0..=31) & 0b11110;
     let mut tries = 5;
     let mut page_frame: usize = 0;
     while tries > 0 {
