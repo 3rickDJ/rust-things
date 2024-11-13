@@ -1,10 +1,11 @@
 use serde_json::{Value, from_str};
 use std::io;
 use std::fs::File;
+use std::io::Read;
 
 fn main() {
     // Reading input: page size, virtual memory size, physical memory size, num of pages
-    let (page_size, virtual_memory_size, physical_memory_size, num_pages, page_references) = read_data("input.json");
+    let (page_size, virtual_memory_size, physical_memory_size, num_pages, page_references) = read_data("data.json");
 
     // Initialize page table (using bits for control flags)
     let mut page_table: Vec<u8> = vec![0; virtual_memory_size/page_size]; // Control bits for each page
@@ -46,6 +47,11 @@ fn main() {
                     // Reset the reference bit and move the clock pointer
                     page_table[clock_pointer] &= 0b11111110; // Clear the reference bit
                     clock_pointer = (clock_pointer + 1) % (physical_memory_size / page_size);
+                }
+                if(reference == 4) {
+                    println!("current_bit: {}", current_bit);
+                    println!("page_table[clock_pointer]: {}", page_table[clock_pointer]);
+                    println!("clock_pointer: {}", clock_pointer);
                 }
             }
         }
