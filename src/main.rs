@@ -1,33 +1,14 @@
+use serde_json::{Value, from_str};
 use std::io;
+use std::fs::File;
 
 fn main() {
     // Reading input: page size, virtual memory size, physical memory size, num of pages
-    let mut input = String::new();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read input");
-    let mut params: Vec<usize> = input
-        .split_whitespace()
-        .map(|x| x.parse().expect("Failed to parse number"))
-        .collect();
-    let page_size = params[0];
-    let virtual_memory_size = params[1];
-    let physical_memory_size = params[2];
-    let num_pages = params[3];
-
-    // Read the page reference list
-    input.clear();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read input");
-    let page_references: Vec<usize> = input
-        .split_whitespace()
-        .map(|x| x.parse().expect("Failed to parse reference"))
-        .collect();
+    let (page_size, virtual_memory_size, physical_memory_size, num_pages, page_references) = read_data("input.json");
 
     // Initialize page table (using bits for control flags)
-    let mut page_table: Vec<u8> = vec![0; num_pages]; // Control bits for each page
-    let mut memory: Vec<i32> = vec![-1; physical_memory_size / page_size]; // Simulated physical memory
+    let mut page_table: Vec<u8> = vec![0; virtual_memory_size/page_size]; // Control bits for each page
+    let mut memory: Vec<i32> = vec![-1; physical_memory_size/ page_size]; // Simulated physical memory
 
     let mut clock_pointer = 0; // Clock pointer to replace pages
 
@@ -90,4 +71,22 @@ fn print_memory_state(memory: &Vec<i32>) {
     for (i, &frame) in memory.iter().enumerate() {
         println!("Frame {}: Page = {}", i, frame);
     }
+}
+
+fn read_data(file: &str)-> (usize, usize, usize, usize, Vec<usize>)  {
+    let mut file = match File::open(file) {
+        Ok(f) => f,
+        Err(e) => panic!("Error al leer el archivo {e}")
+    };
+    let mut buffer = String::new();
+    file.read_to_string(&mut buffer).unwrap();
+    let content =  buffer.to_string();
+    let v: Value = from_str(&content).unwrap();
+
+    let page_size = v["pageSize"]["value"].as_u64().unwrap() as usize;
+    let virtual_memory_size = v["virtualMemorySize"]["value"].as_u64().unwrap() as usize;
+    let physical_memory_size = v["physicalMemorySize"]["value"].as_u64().unwrap() as usize;
+    let _number_of_pages = v["numberOfPages"].as_u64().unwrap() as usize;
+    let reference_list = v["referenceList"].as_array().unwrap().iter().map(|x| x.as_u64().unwrap() as usize).collect();
+    return (page_size, virtual_memory_size, physical_memory_size, _number_of_pages, reference_list);
 }
