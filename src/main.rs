@@ -1,11 +1,18 @@
 use serde_json::{Value, from_str};
-use std::io;
 use std::fs::File;
 use std::io::Read;
 
+const PRESENTE: u8 = 0b10000000; // Bit 7
+const REFERENCIA: u8 = 0b01000000; // Bit 6
+const _PROTECCION_ESCRITURA: u8 = 0b00100000; // Bit 5
+const _PROTECCION_LECTURA: u8 = 0b00010000; // Bit 4
+const MODIFICADO: u8 = 0b00001000; // Bit 3
+const CACHE_HABILITADA: u8 = 0b00000100; // Bit 2
+
+
 fn main() {
     // Reading input: page size, virtual memory size, physical memory size, num of pages
-    let (page_size, virtual_memory_size, physical_memory_size, num_pages, page_references) = read_data("data.json");
+    let (page_size, virtual_memory_size, physical_memory_size, _num_pages, page_references) = read_data("data.json");
 
     // Initialize page table (using bits for control flags)
     let mut page_table: Vec<u8> = vec![0; virtual_memory_size / page_size]; // Control bits for each page
@@ -16,6 +23,9 @@ fn main() {
 
     for reference in page_references {
         println!("\nProcessing reference: {}", reference);
+        // imprimir la direccion virtual, o sea,  bits de control | en binario los bits que ocupe representar el total de la memoria virtual y el numero | desplazameinto (bits que ocupan tamano de pagina)
+        // e imprimir sus bits 
+        // y el l
 
         // Translate the virtual address to physical memory
         let page_index = reference; // In this case, we directly use the page reference
@@ -26,8 +36,9 @@ fn main() {
             if frame == page_index as i32 {
                 page_found = true;
                 // Page found: set the reference bit to 1
-                page_table[i] |= 1; // Page is referred, so set the reference bit
+                set_referencia(&mut page_table, i, true); // Set the reference bit
                 println!("Page {} found in memory at frame {}.", page_index, i);
+                // imprimir la direccion fisica, o sea,  bits de control | en binario los bits que ocupe representar el total de la memoria fisica y el numero | desplazameinto (bits que ocupan tamano de pagina)
                 break;
             }
         }
@@ -42,9 +53,11 @@ fn main() {
                         *frame = page_index as i32; // Place the page in the first available frame
                         free_frames -= 1;
                         // Set the reference bit to 1, indicating that the page is used.
-                        page_table[i] |= 1;  // Set the reference bit
+                        set_referencia(&mut page_table, i, true);  // Set the reference bit
+                        set_presente(&mut page_table, i, true);    // Mark as present
                         println!("Page {} placed in frame {}.", page_index, i);
                         placed = true;
+                        // imprimir la direccion fisica, o sea,  bits de control | en binario los bits que ocupe representar el total de la memoria fisica y el numero | desplazameinto (bits que ocupan tamano de pagina)
                         break;
                     }
                 }
@@ -57,17 +70,19 @@ fn main() {
 
                 // Find the next frame to replace using the clock algorithm
                 loop {
-                    let current_bit = (page_table[clock_pointer] & 1) != 0; // Check the reference bit
+                    let current_bit = (page_table[clock_pointer] & REFERENCIA) != 0; // Check the reference bit
                     if !current_bit {
                         // Replace the page at clock_pointer
                         memory[clock_pointer] = page_index as i32;
-                        page_table[clock_pointer] |= 1; // Set the present bit and reference bit
+                        set_presente(&mut page_table, clock_pointer, true); // Set the present bit
+                        set_referencia(&mut page_table, clock_pointer, true); // Set the reference bit
                         println!("Replaced page {} in frame {}.", page_index, clock_pointer);
                         clock_pointer = (clock_pointer + 1) % (physical_memory_size / page_size);
+                        // imprimir la direccion fisica, o sea,  bits de control | en binario los bits que ocupe representar el total de la memoria fisica y el numero | desplazameinto (bits que ocupan tamano de pagina)
                         break;
                     } else {
                         // Reset the reference bit and move the clock pointer
-                        page_table[clock_pointer] &= 0b11111110; // Clear the reference bit (set to 0)
+                        set_referencia(&mut page_table, clock_pointer, false); // Clear the reference bit
                         clock_pointer = (clock_pointer + 1) % (physical_memory_size / page_size);
                     }
                 }
@@ -89,6 +104,7 @@ fn print_page_table(page_table: &Vec<u8>) {
         );
     }
 }
+
 
 fn print_memory_state(memory: &Vec<i32>) {
     println!("\nPhysical Memory State:");
@@ -113,4 +129,44 @@ fn read_data(file: &str) -> (usize, usize, usize, usize, Vec<usize>) {
     let _number_of_pages = v["numberOfPages"].as_u64().unwrap() as usize;
     let reference_list = v["referenceList"].as_array().unwrap().iter().map(|x| x.as_u64().unwrap() as usize).collect();
     return (page_size, virtual_memory_size, physical_memory_size, _number_of_pages, reference_list);
+}
+
+
+// Función para establecer el bit de presente
+fn set_presente(page_table: &mut Vec<u8>, page_index: usize, value: bool) {
+    if value {
+        page_table[page_index] |= PRESENTE; // Establecer el bit de "presente"
+    } else {
+        page_table[page_index] &= !PRESENTE; // Limpiar el bit de "presente"
+    }
+}
+
+                //
+                //TODO:
+                //a set referencia agregarle el corrimiento de bits que utiliza el frame
+// Función para establecer el bit de referencia
+fn set_referencia(page_table: &mut Vec<u8>, page_index: usize, value: bool) {
+    if value {
+        page_table[page_index] |= REFERENCIA; // Establecer el bit de "referencia"
+    } else {
+        page_table[page_index] &= !REFERENCIA; // Limpiar el bit de "referencia"
+    }
+}
+
+// Función para establecer el bit de modificado
+fn _set_modificado(page_table: &mut Vec<u8>, page_index: usize, value: bool) {
+    if value {
+        page_table[page_index] |= MODIFICADO; // Establecer el bit de "modificado"
+    } else {
+        page_table[page_index] &= !MODIFICADO; // Limpiar el bit de "modificado"
+    }
+}
+
+// Función para establecer el bit de caché habilitada
+fn _set_cache_habilitada(page_table: &mut Vec<u8>, page_index: usize, value: bool) {
+    if value {
+        page_table[page_index] |= CACHE_HABILITADA; // Establecer el bit de "caché habilitada"
+    } else {
+        page_table[page_index] &= !CACHE_HABILITADA; // Limpiar el bit de "caché habilitada"
+    }
 }
