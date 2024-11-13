@@ -8,8 +8,9 @@ fn main() {
     let (page_size, virtual_memory_size, physical_memory_size, num_pages, page_references) = read_data("data.json");
 
     // Initialize page table (using bits for control flags)
-    let mut page_table: Vec<u8> = vec![0; virtual_memory_size/page_size]; // Control bits for each page
-    let mut memory: Vec<i32> = vec![-1; physical_memory_size/ page_size]; // Simulated physical memory
+    let mut page_table: Vec<u8> = vec![0; virtual_memory_size / page_size]; // Control bits for each page
+    let mut memory: Vec<i32> = vec![-1; physical_memory_size / page_size]; // Simulated physical memory
+    let mut free_frames = (physical_memory_size / page_size) as i32; // Counter for free frames
 
     let mut clock_pointer = 0; // Clock pointer to replace pages
 
@@ -24,34 +25,51 @@ fn main() {
         for (i, &frame) in memory.iter().enumerate() {
             if frame == page_index as i32 {
                 page_found = true;
-                println!("Page {} found in memory at frame {}", page_index, i);
+                // Page found: set the reference bit to 1
+                page_table[i] |= 1; // Page is referred, so set the reference bit
+                println!("Page {} found in memory at frame {}.", page_index, i);
                 break;
             }
         }
 
         if !page_found {
-            // Page fault occurred, handle it with clock algorithm
-            println!("Page fault! Replacing a page...");
-
-            // Find the next frame to replace using the clock algorithm
-            loop {
-                let current_bit = (page_table[clock_pointer] & 1) != 0; // Check the reference bit
-                if !current_bit {
-                    // Replace the page at clock_pointer
-                    memory[clock_pointer] = page_index as i32;
-                    page_table[clock_pointer] |= 1; // Set the present bit
-                    println!("Replaced page {} in frame {}.", page_index, clock_pointer);
-                    clock_pointer = (clock_pointer + 1) % (physical_memory_size / page_size);
-                    break;
-                } else {
-                    // Reset the reference bit and move the clock pointer
-                    page_table[clock_pointer] &= 0b11111110; // Clear the reference bit
-                    clock_pointer = (clock_pointer + 1) % (physical_memory_size / page_size);
+            if free_frames > 0 {
+                // Page fault occurred, but there are free frames. Place the page sequentially.
+                println!("Page fault! Placing page {} in memory.", page_index);
+                let mut placed = false;
+                for (i, frame) in memory.iter_mut().enumerate() {
+                    if *frame == -1 {
+                        *frame = page_index as i32; // Place the page in the first available frame
+                        free_frames -= 1;
+                        // Set the reference bit to 1, indicating that the page is used.
+                        page_table[i] |= 1;  // Set the reference bit
+                        println!("Page {} placed in frame {}.", page_index, i);
+                        placed = true;
+                        break;
+                    }
                 }
-                if(reference == 4) {
-                    println!("current_bit: {}", current_bit);
-                    println!("page_table[clock_pointer]: {}", page_table[clock_pointer]);
-                    println!("clock_pointer: {}", clock_pointer);
+                if !placed {
+                    println!("No free frames available!");
+                }
+            } else {
+                // Page fault occurred, and no free frames. Handle it with the clock algorithm.
+                println!("Page fault! Replacing a page...");
+
+                // Find the next frame to replace using the clock algorithm
+                loop {
+                    let current_bit = (page_table[clock_pointer] & 1) != 0; // Check the reference bit
+                    if !current_bit {
+                        // Replace the page at clock_pointer
+                        memory[clock_pointer] = page_index as i32;
+                        page_table[clock_pointer] |= 1; // Set the present bit and reference bit
+                        println!("Replaced page {} in frame {}.", page_index, clock_pointer);
+                        clock_pointer = (clock_pointer + 1) % (physical_memory_size / page_size);
+                        break;
+                    } else {
+                        // Reset the reference bit and move the clock pointer
+                        page_table[clock_pointer] &= 0b11111110; // Clear the reference bit (set to 0)
+                        clock_pointer = (clock_pointer + 1) % (physical_memory_size / page_size);
+                    }
                 }
             }
         }
@@ -79,14 +97,14 @@ fn print_memory_state(memory: &Vec<i32>) {
     }
 }
 
-fn read_data(file: &str)-> (usize, usize, usize, usize, Vec<usize>)  {
+fn read_data(file: &str) -> (usize, usize, usize, usize, Vec<usize>) {
     let mut file = match File::open(file) {
         Ok(f) => f,
         Err(e) => panic!("Error al leer el archivo {e}")
     };
     let mut buffer = String::new();
     file.read_to_string(&mut buffer).unwrap();
-    let content =  buffer.to_string();
+    let content = buffer.to_string();
     let v: Value = from_str(&content).unwrap();
 
     let page_size = v["pageSize"]["value"].as_u64().unwrap() as usize;
