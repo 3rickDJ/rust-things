@@ -1,49 +1,93 @@
-use std::io::Read;
-use std::fs::File;
-use serde_json::from_str;
-use serde_json::Value;
+use std::io;
+
 fn main() {
-    let (page_size, virtual_memory_size, physical_memory_size, _number_of_pages, reference_list) =read_data("data.json");
-    println!("Page size: {}", page_size);
-    println!("Virtual memory size: {}", virtual_memory_size);
-    println!("Physical memory size: {}", physical_memory_size);
-    println!("Number of pages: {}", _number_of_pages);
-    println!("Reference list: {:?}", reference_list);
-    let mut page_table = vec![0_usize; virtual_memory_size / page_size];
-    let mut aging_page_table = vec![0_u32; virtual_memory_size / page_size];
-    println!("Page table: {:?}", page_table);
-    println!("virtual_memory_size / page_size: {}", virtual_memory_size / page_size);
-    //clock algorithm
-    let mut clock = 0;
-    let mut page_faults = 0;
-    for reference in reference_list.iter() {
-        let page = *reference;
-        if page_table[page] == 0 {
-            page_faults += 1;
-            while page_table[clock] == 1 {
-                page_table[clock] = 0;
-                clock = (clock + 1) % page_table.len();
+    // Reading input: page size, virtual memory size, physical memory size, num of pages
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read input");
+    let mut params: Vec<usize> = input
+        .split_whitespace()
+        .map(|x| x.parse().expect("Failed to parse number"))
+        .collect();
+    let page_size = params[0];
+    let virtual_memory_size = params[1];
+    let physical_memory_size = params[2];
+    let num_pages = params[3];
+
+    // Read the page reference list
+    input.clear();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read input");
+    let page_references: Vec<usize> = input
+        .split_whitespace()
+        .map(|x| x.parse().expect("Failed to parse reference"))
+        .collect();
+
+    // Initialize page table (using bits for control flags)
+    let mut page_table: Vec<u8> = vec![0; num_pages]; // Control bits for each page
+    let mut memory: Vec<i32> = vec![-1; physical_memory_size / page_size]; // Simulated physical memory
+
+    let mut clock_pointer = 0; // Clock pointer to replace pages
+
+    for reference in page_references {
+        println!("\nProcessing reference: {}", reference);
+
+        // Translate the virtual address to physical memory
+        let page_index = reference; // In this case, we directly use the page reference
+
+        // Check if the page is already in physical memory
+        let mut page_found = false;
+        for (i, &frame) in memory.iter().enumerate() {
+            if frame == page_index as i32 {
+                page_found = true;
+                println!("Page {} found in memory at frame {}", page_index, i);
+                break;
             }
-            page_table[clock] = 1;
-            clock = (clock + 1) % page_table.len();
         }
+
+        if !page_found {
+            // Page fault occurred, handle it with clock algorithm
+            println!("Page fault! Replacing a page...");
+
+            // Find the next frame to replace using the clock algorithm
+            loop {
+                let current_bit = (page_table[clock_pointer] & 1) != 0; // Check the reference bit
+                if !current_bit {
+                    // Replace the page at clock_pointer
+                    memory[clock_pointer] = page_index as i32;
+                    page_table[clock_pointer] |= 1; // Set the present bit
+                    println!("Replaced page {} in frame {}.", page_index, clock_pointer);
+                    clock_pointer = (clock_pointer + 1) % (physical_memory_size / page_size);
+                    break;
+                } else {
+                    // Reset the reference bit and move the clock pointer
+                    page_table[clock_pointer] &= 0b11111110; // Clear the reference bit
+                    clock_pointer = (clock_pointer + 1) % (physical_memory_size / page_size);
+                }
+            }
+        }
+
+        // Output memory state
+        print_page_table(&page_table);
+        print_memory_state(&memory);
     }
 }
 
-fn read_data(file: &str)-> (usize, usize, usize, usize, Vec<usize>)  {
-    let mut file = match File::open(file) {
-        Ok(f) => f,
-        Err(e) => panic!("Error al leer el archivo {e}")
-    };
-    let mut buffer = String::new();
-    file.read_to_string(&mut buffer).unwrap();
-    let content =  buffer.to_string();
-    let v: Value = from_str(&content).unwrap();
+fn print_page_table(page_table: &Vec<u8>) {
+    println!("\nPage Table (in decimal, hex, binary):");
+    for (i, &entry) in page_table.iter().enumerate() {
+        println!(
+            "Page {}: Decimal = {}, Hex = {:X}, Binary = {:08b}",
+            i, entry, entry, entry
+        );
+    }
+}
 
-    let page_size = v["pageSize"]["value"].as_u64().unwrap() as usize;
-    let virtual_memory_size = v["virtualMemorySize"]["value"].as_u64().unwrap() as usize;
-    let physical_memory_size = v["physicalMemorySize"]["value"].as_u64().unwrap() as usize;
-    let _number_of_pages = v["numberOfPages"].as_u64().unwrap() as usize;
-    let reference_list = v["referenceList"].as_array().unwrap().iter().map(|x| x.as_u64().unwrap() as usize).collect();
-    return (page_size, virtual_memory_size, physical_memory_size, _number_of_pages, reference_list);
+fn print_memory_state(memory: &Vec<i32>) {
+    println!("\nPhysical Memory State:");
+    for (i, &frame) in memory.iter().enumerate() {
+        println!("Frame {}: Page = {}", i, frame);
+    }
 }
