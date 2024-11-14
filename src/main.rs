@@ -43,12 +43,11 @@ fn main() {
                 if memory[clock_pointer] == -1 {
                     memory[clock_pointer] = page_index as i32;
                     page_table[page_index] = clock_pointer;
-                    println!("Clock pointer: {}", clock_pointer);
-                    println!("Page table new entry with page {}: {}", page_index, page_table[page_index]);
                     set_presente(&mut page_table, page_index, offset_bits, frame_bits, true);
                     clock_pointer = (clock_pointer + 1) % memory.len();
                     break;
-                }
+                } 
+                println!("Running clock algorithm...");
                 let page_to_replace_number = memory[clock_pointer];
                 let reference_bit = ((page_table[page_to_replace_number as usize] >> frame_bits) & REFERENCIA) == REFERENCIA;
                 if !reference_bit {
@@ -65,8 +64,6 @@ fn main() {
                 clock_pointer = (clock_pointer + 1) % memory.len();
             }
         }
-        println!("\nPage Table after processing reference:");
-        println!("\nClock Pointer: {}", clock_pointer);
         print_page_table(&page_table, frame_bits);
         print_memory_state(&memory);
     }
@@ -124,10 +121,9 @@ fn read_data(file: &str) -> (String, usize, usize, usize, usize, Vec<usize>) {
 
 
 // Función para establecer el bit de presente
-fn set_presente(page_table: &mut Vec<usize>, page_index: usize, offset_bits: usize, frame_bits: usize, value: bool) {
+fn set_presente(page_table: &mut Vec<usize>, page_index: usize, _offset_bits: usize, frame_bits: usize, value: bool) {
     if value {
         page_table[page_index] |= PRESENTE << (frame_bits); // Establecer el bit de "presente"
-        println!("page_table[page_index]: {}", page_table[page_index]);
     } else {
         page_table[page_index] &= !PRESENTE << (frame_bits); // Limpiar el bit de "presente"
     }
@@ -137,7 +133,7 @@ fn set_presente(page_table: &mut Vec<usize>, page_index: usize, offset_bits: usi
                 //TODO:
                 //a set referencia agregarle el corrimiento de bits que utiliza el frame
 // Función para establecer el bit de referencia
-fn set_referencia(page_table: &mut Vec<usize>, page_index: usize, offset_bits: usize, frame_bits: usize, value: bool) {
+fn set_referencia(page_table: &mut Vec<usize>, page_index: usize, _offset_bits: usize, frame_bits: usize, value: bool) {
     if value {
         page_table[page_index] |= REFERENCIA << (frame_bits); // Establecer el bit de "referencia"
     } else {

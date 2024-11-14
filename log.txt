@@ -1,0 +1,476 @@
+offset bits: 10, page bits: 3, frame bits: 2
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 0
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 0
+Frame 1: Page = -1
+Frame 2: Page = -1
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 4
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 5, Hex = 5, Binary = 00000101 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 0
+Frame 1: Page = 4
+Frame 2: Page = -1
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 1
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 5, Hex = 5, Binary = 00000101 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 0
+Frame 1: Page = 4
+Frame 2: Page = 1
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 4
+Page 4 found in memory
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 37, Hex = 25, Binary = 00100101 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 0
+Frame 1: Page = 4
+Frame 2: Page = 1
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 2
+Running clock algorithm...
+Replacing page 0 with page 2
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 37, Hex = 25, Binary = 00100101 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 2
+Frame 1: Page = 4
+Frame 2: Page = 1
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 4
+Page 4 found in memory
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 37, Hex = 25, Binary = 00100101 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 2
+Frame 1: Page = 4
+Frame 2: Page = 1
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 3
+Running clock algorithm...
+Running clock algorithm...
+Replacing page 1 with page 3
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 2
+Frame 1: Page = 4
+Frame 2: Page = 3
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 4
+Page 4 found in memory
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 2
+Frame 1: Page = 4
+Frame 2: Page = 3
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 2
+Page 2 found in memory
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+Page 3: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 2
+Frame 1: Page = 4
+Frame 2: Page = 3
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 4
+Page 4 found in memory
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+Page 3: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 2
+Frame 1: Page = 4
+Frame 2: Page = 3
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 0
+Running clock algorithm...
+Running clock algorithm...
+Running clock algorithm...
+Replacing page 3 with page 0
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 2
+Frame 1: Page = 4
+Frame 2: Page = 0
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 4
+Page 4 found in memory
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 2
+Frame 1: Page = 4
+Frame 2: Page = 0
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 1
+Running clock algorithm...
+Replacing page 2 with page 1
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 1
+Frame 1: Page = 4
+Frame 2: Page = 0
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 4
+Page 4 found in memory
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 1
+Frame 1: Page = 4
+Frame 2: Page = 0
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 2
+Running clock algorithm...
+Running clock algorithm...
+Replacing page 0 with page 2
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 1
+Frame 1: Page = 4
+Frame 2: Page = 2
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 4
+Page 4 found in memory
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 1
+Frame 1: Page = 4
+Frame 2: Page = 2
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 3
+Running clock algorithm...
+Replacing page 1 with page 3
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 3
+Frame 1: Page = 4
+Frame 2: Page = 2
+
+
+
+
+
+
+
+
+
+
+
+
+Processing reference: 4
+Page 4 found in memory
+
+Page Table (in decimal, hex, binary):
+Page 0: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 1: Decimal = 0, Hex = 0, Binary = 00000000 - Present: false, Protection: false, Modified: false, Reference: false, Cache: false
+Page 2: Decimal = 6, Hex = 6, Binary = 00000110 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 3: Decimal = 4, Hex = 4, Binary = 00000100 - Present: true, Protection: false, Modified: false, Reference: false, Cache: false
+Page 4: Decimal = 36, Hex = 24, Binary = 00100100 - Present: true, Protection: false, Modified: false, Reference: true, Cache: false
+
+Physical Memory State:
+Frame 0: Page = 3
+Frame 1: Page = 4
+Frame 2: Page = 2
