@@ -1,11 +1,11 @@
 {
   "unit": "KB",
   "pageSize": 1,
-  "virtualMemorySize": 8,
-  "physicalMemorySize": 4,
+  "virtualMemorySize": 5,
+  "physicalMemorySize": 3,
   "numberOfPages" : 14,
   "referenceList" : [
-      0,1,2,3,0,4,5,1,0,1,1,2,8,3,2,7,8,8,2,7,0
+    0,4,1,4,2,4,3,4,2,4,0,4,1,4,2,4,3,4
   ]
 
 }
