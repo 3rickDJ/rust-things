@@ -64,9 +64,31 @@ fn main() {
                 clock_pointer = (clock_pointer + 1) % memory.len();
             }
         }
+        print_physical_and_virtual_address(page_index, offset_bits, page_bits, frame_bits, &page_table, &memory);
         print_page_table(&page_table, frame_bits);
         print_memory_state(&memory);
     }
+}
+
+fn print_physical_and_virtual_address(page_index: usize, offset_bits: usize, page_bits: usize, frame_bits: usize, page_table: &Vec<usize>, _memory: &Vec<i32>) {
+    // print |control bits | page number | offset number
+    // print |control bits | frame number | offset number
+    // print paddet with the bits that are neede wfor page or frame
+    let frame_number = (page_table[page_index]) & ((1 << frame_bits) - 1);
+    let physical_address = frame_number << offset_bits;
+    let page_number = page_index;
+    let virtual_address = page_number << offset_bits;
+    let width = page_bits + offset_bits;
+    println!(
+        "Virtual Address: Decimal = {}, Hex = {:X}, Binary = {:0width$b}",
+        virtual_address, virtual_address, virtual_address, width = width
+    );
+    let width = frame_bits + offset_bits;
+    println!(
+        "\nPhysical Address: Decimal = {}, Hex = {:X}, Binary = {:0width$b}",
+        physical_address, physical_address, physical_address, width = width
+    );
+
 }
 
 fn print_page_table(page_table: &Vec<usize>, frame_bits: usize) {
