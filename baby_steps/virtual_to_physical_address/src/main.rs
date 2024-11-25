@@ -22,7 +22,7 @@ fn main() {
             Err(e) => {panic!("Error al leer la línea: {e}")}
         };
 
-        let number = match usize::from_str_radix(&input, 2) {
+        let number = match usize::from_str_radix(&input, 10) {
             Ok(n) => n,
             Err(e) => panic!("Error al transformar a binario: {e}")
         };
@@ -69,7 +69,7 @@ fn read_configuration_and_page_table(filename: &str) -> (usize, usize, usize, Ve
     file.read_to_string(&mut buffer).unwrap();
     let mut lines = buffer.lines();
     let configuration = lines.next().unwrap();
-    let page_table = lines.map(|l| usize::from_str_radix(l, 2).unwrap()).collect();
+    let page_table = lines.map(|l| usize::from_str_radix(l, 10).unwrap()).collect();
     let mut config = configuration.split_whitespace();
     let page_size = config.next().unwrap().parse().unwrap();
     let number_of_pages = config.next().unwrap().parse().unwrap();
