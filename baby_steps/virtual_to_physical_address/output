@@ -1,0 +1,8 @@
+Ingrese la dirección virtual en binario junto con su desplazamiento: 1418
+Entrada de la tabla de páginas:                                00000000_00011000 24
+Direccion física:                                                              0 0
+Desplazamiento:                                                             1010 10
+Bits asociados:                                                               11 3
+CacheDisabled 0, Referenced 0, Modified 0, Protection 1, Present/Absent 1
+
+Ingrese la dirección virtual en binario junto con su desplazamiento:
